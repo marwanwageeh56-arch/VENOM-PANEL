@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XREG Client</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+    
+    <div id="loginBox" class="space-y-4">
+      <h1 class="text-2xl font-bold text-cyan-400 text-center">XREG CLIENT</h1>
+      <p class="text-xs text-slate-400 text-center">سجل دخولك باستخدام مفتاح الترخيص</p>
+      
+      <input type="text" id="keyInput" placeholder="XREG-XXXX-XXXX" 
+             class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center uppercase tracking-widest text-cyan-300 outline-none">
+      
+      <p id="errorMsg" class="text-xs text-rose-400 text-center hidden"></p>
+      
+      <button onclick="login()" class="w-full bg-cyan-600 hover:bg-cyan-500 py-3 rounded-xl font-bold transition">دخول</button>
+      
+      <p class="text-[11px] text-center text-slate-500">
+        المالك؟ <a href="/admin.html" class="text-cyan-400 underline">لوحة الإدارة</a>
+      </p>
+    </div>
+
+    <div id="panelBox" class="space-y-4 hidden">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-xs text-slate-400 block">المفتاح</span>
+          <span id="activeKey" class="text-xs font-mono font-bold text-cyan-400"></span>
+        </div>
+        <div>
+          <span class="text-xs text-slate-400 block">الصلاحية</span>
+          <span id="remainingDays" class="text-xs font-bold text-emerald-400"></span>
+        </div>
+      </div>
+      <div class="bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-xl text-center text-emerald-400 text-xs">
+        ✔ متصل بالسيرفر بنجاح
+      </div>
+      <button onclick="location.reload()" class="w-full bg-slate-800 py-2 rounded-xl text-xs font-bold text-rose-400">خروج</button>
+    </div>
+
+  </div>
+
+  <script>
+    async function login() {
+      const key = document.getElementById('keyInput').value;
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('panelBox').classList.remove('hidden');
+        document.getElementById('activeKey').innerText = data.key;
+        document.getElementById('remainingDays').innerText = data.remainingDays + ' يوم';
+      } else {
+        const err = document.getElementById('errorMsg');
+        err.innerText = data.msg;
+        err.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
